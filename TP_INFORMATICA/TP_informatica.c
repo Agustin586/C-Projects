@@ -23,28 +23,28 @@ void OPCION1 (void);        // Ingresa a la opcion 1 y realiza el procesamiento 
 void OPCION2 (void);        // Ingresa a la opcion 2 y realiza ...
 void OPCION3 (void);        // ...
 void OPCION4 (void);        // ...
-void CargarArchivo (FILE *archivo,int num_archiv);
-void RANKING (void);
-void CargaTotalViews (void);
-int BuscaID (int id);
-void CargarTop10 (float Top10_views[],int Top10_id[]);
-void OrdenarListaPeliculas (void);
-void MostrarTop10 (float Top10_views[],int Top10_id[]);
-void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[]);
+void CargarArchivo (FILE *archivo,int num_archiv);                  // Esta funcion se encarga de cargar los archivo al registro
+void RANKING (void);                                                // Se encarga de procesar la opcion 1
+void CargaTotalViews (void);                                        // Carga el total del views en el registro
+int BuscaID (int id);                                               // Busca la id en el registro
+void CargarTop10 (float Top10_views[],int Top10_id[]);              // Carga el top10 de peliculas en dos arreglos
+void OrdenarListaPeliculas (void);                                  // Ordena el registro segun el total de views de forma descendete
+void MostrarTop10 (float Top10_views[],int Top10_id[]);             // Muestra el top10 de views y su id
+void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[]);  // Graba en un archivo top10.txt los datos correspondientes
 
+// Funcion principal //
+// -------------------------------------- //
 int main ()
 {
     FILE *archivo_pelicula,*archivo_datos7dias;
     int opcion;
 
     printf("Bievenidos al programa\n");
-
     // Inicializamos el registro
     Inicializar();
-
     // Abre el archivo y carga los datos al registro
-    CargarArchivo(archivo_pelicula,1);
-    CargarArchivo(archivo_datos7dias,2);
+    CargarArchivo(archivo_pelicula,1);      // Abre el archivo peliculas.txt
+    CargarArchivo(archivo_datos7dias,2);    // Abre el archivo datos_7dias.txt
 
     printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
     scanf("%d",&opcion);
@@ -77,16 +77,15 @@ int main ()
         printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
         scanf("%d",&opcion);
     }
-
     printf("\nGracias por usar el programa");
 
     getch();
     return 0;
 }
+// -------------------------------------- //
 
-// Cuerpo de funciones //
-
-// --Funciones de inicializacion-- //
+// Funciones de inicializacion //
+// -------------------------------------- //
 void Inicializar (void)
 {   
     for (int i = 0; i < MAX_PELICULAS; i++)
@@ -156,8 +155,10 @@ void CargarArchivo (FILE *archivo,int num_archivo)
     fclose(archivo);
     return;
 }
+// -------------------------------------- //
 
-// --Funciones de menu-- //
+// Funciones de menu //
+// -------------------------------------- //
 void OPCION1 (void)
 {
     RANKING();
@@ -165,7 +166,7 @@ void OPCION1 (void)
 }
 void OPCION2 (void)
 {
-	printf("Opcion2");
+
     return;
 }
 void OPCION3 (void)
@@ -187,7 +188,10 @@ void OPCION4 (void)
     }
     return;
 }
+// -------------------------------------- //
 
+// Funciones relacionadas con la opcion 1 //
+// -------------------------------------- //
 void RANKING (void)
 {
     FILE *archivo_top10;
@@ -202,11 +206,11 @@ void RANKING (void)
     MostrarTop10(Top10_views,Top10_id);
     //Graba todo a un archivo
     GRABAR_TOP10(archivo_top10,Top10_views,Top10_id);
+    // Permite no cargar dos o mas veces el total de views en la lista de peliculas
     Cant_opc1 = 1;
 
     return;
 }
-
 void CargaTotalViews(void)
 {
     int dia,lista;
@@ -231,11 +235,11 @@ void CargaTotalViews(void)
     // }
     return;
 }
-
 int BuscaID(int id)
 {
     int indice;
 
+    // Comienza la busqueda de la id, recorriendo la lista de peliculas existentes
     for (int i = 0; i < MAX_PELICULAS; i++)
     {
         if (ListaPeliculas[i].ID == id)
@@ -244,9 +248,10 @@ int BuscaID(int id)
             return indice;
         }    
     }
+    // En caso de no encontrar el id de la pelicula devuelve el indice 101
+    // dando a entender que no existe
     return MAX_PELICULAS+1;
 }
-
 void CargarTop10(float Top10_views[],int Top10_id[])
 {
     // Limpiamos el arreglo para borrar los archivos basuras //
@@ -262,12 +267,10 @@ void CargarTop10(float Top10_views[],int Top10_id[])
     {
         Top10_views[top10] = ListaPeliculas[top10].Views_Total;
         Top10_id[top10] = ListaPeliculas[top10].ID;
-        // printf("\n%d\t%.0f",Top10_id[top10],Top10_views[top10]);
     }
     
     return;
 }
-
 void OrdenarListaPeliculas (void)
 {
     peliculas aux;
@@ -293,9 +296,9 @@ void OrdenarListaPeliculas (void)
     }
     return;
 }
-
 void MostrarTop10 (float Top10_views[],int Top10_id[])
 {
+    // Muestra por pantalla los datos
     printf("\nID:\tViews:\t");
     for (int top10 = 0; top10 < 10; top10++)
     {
@@ -304,16 +307,19 @@ void MostrarTop10 (float Top10_views[],int Top10_id[])
     printf("\n");
     return;
 }
-
 void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[])
 {
+    // Abre el archivo como escritura
     if ((top10 = fopen("top10.txt", "w")) == NULL)    
             printf ( "Error en la apertura. Es posible que el fichero no exista \n");
+    // Comienza a escribir
     fprintf(top10,"ID:\tViews:\n");
     for (int i = 0; i < TOP10; i++)
     {
         fprintf(top10,"%d\t%.0f\n",Top10_id[i],Top10_views[i]);
     }
+    // Cierra el archivo top10.txt
     fclose(top10);
     return;
 }
+// -------------------------------------- //
