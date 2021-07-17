@@ -100,34 +100,39 @@ void CargarArchivo (FILE *archivo,int num_archivo)
 {
     if (num_archivo == 1)
     {
-        if ((archivo = fopen("peliculas.txt", "r")) == NULL)
+        if ((archivo = fopen("peliculas.txt", "r")) == NULL)    
             printf ( "Error en la apertura. Es posible que el fichero no exista \n");
-        for (int i = 0;i < MAX_PELICULAS; i++)
+        else
         {
-            if (!feof(archivo))
+            for (int i = 0;i < MAX_PELICULAS; i++)
             {
-                fscanf (archivo, "%d%s\n", &ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
+                if (!feof(archivo))
+                {
+                    fscanf (archivo, "%d%s\n", &ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
+                }
+                printf("\n%d %s",ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
             }
-            printf("\n%d %s",ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
         }
     }
     else if (num_archivo == 2)
     {
-        if ((archivo = fopen("datos_7dias.txt", "r")) == NULL)
-            printf ( "Error en la apertura. Es posible que el fichero no exista \n");
         int id_aux,dia,views,lista;
         float punt;
-        
-        while (!feof(archivo))
+        if ((archivo = fopen("datos_7dias.txt", "r")) == NULL)
+            printf ( "Error en la apertura. Es posible que el fichero no exista \n");
+        else
         {
-            fscanf (archivo, "%d%d%d%f",&id_aux,&dia,&views,&punt);
-            lista = BuscaID(id_aux);
-            if (lista == MAX_PELICULAS+1)
-                printf("La pelicula no existe");
-            else
+            while (!feof(archivo))
             {
-                ListaPeliculas[lista].Views_dia[dia-1] = views;
-                ListaPeliculas[lista].Punt_dia[dia-1] = punt;   
+                fscanf (archivo, "%d%d%d%f",&id_aux,&dia,&views,&punt);
+                lista = BuscaID(id_aux);
+                if (lista == MAX_PELICULAS+1)
+                    printf("La pelicula no existe");
+                else
+                {
+                    ListaPeliculas[lista].Views_dia[dia-1] = views;
+                    ListaPeliculas[lista].Punt_dia[dia-1] = punt;   
+                }
             }
         }
         // printf("\n\n");
@@ -176,7 +181,7 @@ void RANKING (void)
     //Carga el total de visualizaciones
 	CargaTotalViews();
     //Compara todas las visualizaciones del conjunto y genera una nueva lista con el top10 de visualizaciones y de IDs de peliculas 
-    //Compara(Top10_views,Top10_id);
+    Compara(Top10_views,Top10_id);
     //Muestra por pantalla toda la lista
     //Muestra();
     //Graba todo a un archivo
@@ -189,7 +194,7 @@ void CargaTotalViews(void)
 {
     int dia,lista;
 
-    //Limpia el total de visualizaciones en todo el conjunto de peliculas
+    //Suma el total de views de cada pelicula
     for (lista = 0;lista < MAX_PELICULAS; lista++)
     {
         for ( dia = 0; dia < DIAS; dia++)
@@ -224,3 +229,5 @@ int BuscaID(int id)
     }
     return MAX_PELICULAS+1;
 }
+
+
