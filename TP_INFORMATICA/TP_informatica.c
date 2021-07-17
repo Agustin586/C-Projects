@@ -159,7 +159,7 @@ void OPCION1 (void)
 }
 void OPCION2 (void)
 {
-
+	printf("Opcion2");
     return;
 }
 void OPCION3 (void)
