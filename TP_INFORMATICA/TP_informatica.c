@@ -4,9 +4,11 @@
 
 #define MAX_PELICULAS   100
 #define DIAS            7
-#define MAX_LONG_NOMBRE     60
+#define MAX_LONG_NOMBRE 60
+#define TOP10           10
 
 // Declaracion de variables globales
+_Bool Cant_opc1;
 typedef struct {
     int ID,Views_dia[DIAS];
     float Punt_dia[DIAS],Views_Total,Punt_Total;
@@ -21,10 +23,14 @@ void OPCION1 (void);        // Ingresa a la opcion 1 y realiza el procesamiento 
 void OPCION2 (void);        // Ingresa a la opcion 2 y realiza ...
 void OPCION3 (void);        // ...
 void OPCION4 (void);        // ...
-void CargarArchivo(FILE *archivo,int num_archiv);
-void RANKING(void);
-void CargaTotalViews(void);
-int BuscaID(int id);
+void CargarArchivo (FILE *archivo,int num_archiv);
+void RANKING (void);
+void CargaTotalViews (void);
+int BuscaID (int id);
+void CargarTop10 (float Top10_views[],int Top10_id[]);
+void OrdenarListaPeliculas (void);
+void MostrarTop10 (float Top10_views[],int Top10_id[]);
+void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[]);
 
 int main ()
 {
@@ -40,7 +46,7 @@ int main ()
     CargarArchivo(archivo_pelicula,1);
     CargarArchivo(archivo_datos7dias,2);
 
-    printf("Menu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\nOpcion:");
+    printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
     scanf("%d",&opcion);
 
     while (opcion != 0)
@@ -68,7 +74,7 @@ int main ()
             break;
             }
         }
-        printf("Menu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\nOpcion:");
+        printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
         scanf("%d",&opcion);
     }
 
@@ -110,7 +116,8 @@ void CargarArchivo (FILE *archivo,int num_archivo)
                 {
                     fscanf (archivo, "%d%s\n", &ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
                 }
-                printf("\n%d %s",ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
+                // Muestra por pantalla toda la lista del archivo
+                // printf("\n%d %s",ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
             }
         }
     }
@@ -153,7 +160,6 @@ void CargarArchivo (FILE *archivo,int num_archivo)
 // --Funciones de menu-- //
 void OPCION1 (void)
 {
-    printf("\n\n");
     RANKING();
     return;
 }
@@ -184,17 +190,19 @@ void OPCION4 (void)
 
 void RANKING (void)
 {
-    float Top10_views[10];
-    int Top10_id[10];
+    FILE *archivo_top10;
+    float Top10_views[TOP10];
+    int Top10_id[TOP10];
 
     //Carga el total de visualizaciones
-	CargaTotalViews();
-    //Compara todas las visualizaciones del conjunto y genera una nueva lista con el top10 de visualizaciones y de IDs de peliculas 
-    Compara(Top10_views,Top10_id);
+	if (!Cant_opc1) CargaTotalViews();
+    //Genera una nueva lista con el top10 de visualizaciones y de IDs de peliculas 
+    CargarTop10(Top10_views,Top10_id);
     //Muestra por pantalla toda la lista
-    //Muestra();
+    MostrarTop10(Top10_views,Top10_id);
     //Graba todo a un archivo
-    //GRABAR_TOP10(Top10_views,Top10_id);
+    GRABAR_TOP10(archivo_top10,Top10_views,Top10_id);
+    Cant_opc1 = 1;
 
     return;
 }
@@ -211,16 +219,16 @@ void CargaTotalViews(void)
             ListaPeliculas[lista].Views_Total = ListaPeliculas[lista].Views_dia[dia] + ListaPeliculas[lista].Views_Total;
         }
     }
-    printf("\n\n");
-    for (int i = 0; i < MAX_PELICULAS; i++)
-    {
-        printf("Id:\tDia:\tViews:\tPuntuacion:\tTotal Views:");
-        for (int dia_ = 0; dia_ < DIAS; dia_++)
-        {
-            printf("\n%d\t%d\t%d\t%.2f\t\t%.0f",ListaPeliculas[i].ID,dia_+1,ListaPeliculas[i].Views_dia[dia_],ListaPeliculas[i].Punt_dia[dia_],ListaPeliculas[i].Views_Total);  
-        }
-        printf("\n\n");
-    }
+    // printf("\n\n");
+    // for (int i = 0; i < MAX_PELICULAS; i++)
+    // {
+    //     printf("Id:\tDia:\tViews:\tPuntuacion:\tTotal Views:");
+    //     for (int dia_ = 0; dia_ < DIAS; dia_++)
+    //     {
+    //         printf("\n%d\t%d\t%d\t%.2f\t\t%.0f",ListaPeliculas[i].ID,dia_+1,ListaPeliculas[i].Views_dia[dia_],ListaPeliculas[i].Punt_dia[dia_],ListaPeliculas[i].Views_Total);  
+    //     }
+    //     printf("\n\n");
+    // }
     return;
 }
 
@@ -239,4 +247,73 @@ int BuscaID(int id)
     return MAX_PELICULAS+1;
 }
 
+void CargarTop10(float Top10_views[],int Top10_id[])
+{
+    // Limpiamos el arreglo para borrar los archivos basuras //
+    for (int top10 = 0; top10 < 10; top10++)
+    {
+        Top10_views[top10] = 0;
+        Top10_id[top10] = 0;
+    }
+    // Ordenamos la lista de peliculas según su total de visualizaciones //
+    OrdenarListaPeliculas ();
+    //Copia los 10 primeros elementos del arreglo en el top10
+    for (int top10 = 0; top10 < 10; top10++)
+    {
+        Top10_views[top10] = ListaPeliculas[top10].Views_Total;
+        Top10_id[top10] = ListaPeliculas[top10].ID;
+        // printf("\n%d\t%.0f",Top10_id[top10],Top10_views[top10]);
+    }
+    
+    return;
+}
 
+void OrdenarListaPeliculas (void)
+{
+    peliculas aux;
+    int lista,j,lugar;
+
+    // Ordenamiento por seleccion //
+    for ( lista = 0; lista < MAX_PELICULAS-1; lista++)
+    {
+        aux = ListaPeliculas[lista];
+        lugar = lista;
+
+        for ( j = lista+1; j < MAX_PELICULAS; j++)
+        {
+            if (ListaPeliculas[j].Views_Total > aux.Views_Total)
+            {
+                aux = ListaPeliculas[j];
+                lugar = j;
+            }
+        }
+        // Intercambia los registros //
+        ListaPeliculas[lugar] = ListaPeliculas[lista];
+        ListaPeliculas[lista] = aux;        
+    }
+    return;
+}
+
+void MostrarTop10 (float Top10_views[],int Top10_id[])
+{
+    printf("\nID:\tViews:\t");
+    for (int top10 = 0; top10 < 10; top10++)
+    {
+        printf("\n%d\t%.0f",Top10_id[top10],Top10_views[top10]);
+    }
+    printf("\n");
+    return;
+}
+
+void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[])
+{
+    if ((top10 = fopen("top10.txt", "w")) == NULL)    
+            printf ( "Error en la apertura. Es posible que el fichero no exista \n");
+    fprintf(top10,"ID:\tViews:\n");
+    for (int i = 0; i < TOP10; i++)
+    {
+        fprintf(top10,"%d\t%.0f\n",Top10_id[i],Top10_views[i]);
+    }
+    fclose(top10);
+    return;
+}
