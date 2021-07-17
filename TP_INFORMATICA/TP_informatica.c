@@ -169,7 +169,16 @@ void OPCION3 (void)
 }
 void OPCION4 (void)
 {
+	int dia,lista;
 
+    //Suma el total de views de cada pelicula
+    for (lista = 0;lista < MAX_PELICULAS; lista++)
+    {
+        for ( dia = 0; dia < DIAS; dia++)
+        {
+            ListaPeliculas[lista].Views_Total = ListaPeliculas[lista].Views_dia[dia] + ListaPeliculas[lista].Views_Total;
+        }
+    }
     return;
 }
 
