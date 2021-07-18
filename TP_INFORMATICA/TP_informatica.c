@@ -16,6 +16,7 @@ typedef struct {
 }peliculas;
 
 peliculas ListaPeliculas[MAX_PELICULAS];
+int contpelis, views, i;
 
 // Lista de funciones
 void Inicializar (void);    // Inicializa la lista de peliculas por archivos basuras
