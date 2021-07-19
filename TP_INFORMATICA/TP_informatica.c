@@ -31,7 +31,7 @@ int main ()
     FILE *archivo_pelicula,*archivo_datos7dias;
     int opcion;
 sds
-    printf("Bievenidos al programa\n");
+    prisntf("Bievenidos al programa\n");
 
     // Inicializamos el registro
     Inicializar();
