@@ -211,7 +211,8 @@ void CargaTotalViews(void)
 }
 
 int BuscaID(int id)
-{
+{asdasd
+	print("ss");
     int indice;
 
     for (int i = 0; i < MAX_PELICULAS; i++)
