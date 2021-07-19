@@ -14,7 +14,7 @@ typedef struct {
     float Punt_dia[DIAS],Views_Total,Punt_Total;
     char Nombre[MAX_LONG_NOMBRE];
 }peliculas;
-
+asdasdsad
 peliculas ListaPeliculas[MAX_PELICULAS];
 
 // Lista de funciones
