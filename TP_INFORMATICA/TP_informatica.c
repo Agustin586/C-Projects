@@ -31,13 +31,15 @@ void CargarTop10 (float Top10_views[],int Top10_id[]);              // Carga el 
 void OrdenarListaPeliculas (void);                                  // Ordena el registro segun el total de views de forma descendete
 void MostrarTop10 (float Top10_views[],int Top10_id[]);             // Muestra el top10 de views y su id
 void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[]);  // Graba en un archivo top10.txt los datos correspondientes
+void AccionesComunes(void);                                         // Llama a funciones que son comunes a mas de una opcion
+float VALORACION_PONDERADA(int lugar);
 
 // Funcion principal //
 // -------------------------------------- //
 int main ()
 {
     FILE *archivo_pelicula,*archivo_datos7dias;
-    int opcion, cantpelis, views, i;
+    int opcion, cantpelis;
 
     printf("Bievenidos al programa\n");
     // Inicializamos el registro
@@ -45,9 +47,17 @@ int main ()
     // Abre el archivo y carga los datos al registro
     CargarArchivo(archivo_pelicula,1);      // Abre el archivo peliculas.txt
     CargarArchivo(archivo_datos7dias,2);    // Abre el archivo datos_7dias.txt
+    // Inicializamos las funciones que son comunes a varias opciones
+    AccionesComunes();
 
     printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
     scanf("%d",&opcion);
+    while (opcion < 0 || opcion > 4)
+    {
+        printf("Ingrese de nuevo\n");
+        printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
+        scanf("%d",&opcion);
+    }
 
     while (opcion != 0)
     {
@@ -65,24 +75,34 @@ int main ()
             }
             case 3:
            {
-                printf("Ingrese cantidad de visualizaciones= ");
+                int views,i;
+                printf("Ingrese cantidad de visualizaciones: ");
                 scanf("%d", &views);
                 printf("\n");
-                contpelis=0;
-		CargaToalViews();
+                cantpelis=0;
                 i=0;
-                while(i<=MAX_PELICULAS){
-                    i=i+1;
-                    while(views<ListaPeliculas[i].Views_Total){
-                        printf("\tPelicula--Visualizaciones\n %s -- %.0f\n\n", ListaPeliculas[i].Nombre, ListaPeliculas[i].Views_Total);
-                        contpelis=contpelis+1;
+                while(i<MAX_PELICULAS)
+                {
+                    while(views<ListaPeliculas[i].Views_Total)
+                    {
+                        peliculas aux;
+                        int long_nombre = strlen(ListaPeliculas[i].Nombre); // strlen
+                        aux = ListaPeliculas[i];
+                        for (int indice = long_nombre; indice < 43; indice++)
+                        {
+                            strcat(aux.Nombre," ");   //
+                        }
+                        
+                        printf("===============================================================================================\n");
+                        printf("Pelicula:\t\t\t\t\t\tVisualizaciones:\n%s\t\t%.0f\n", aux.Nombre, aux.Views_Total);
+                        printf("===============================================================================================\n");
+                        cantpelis=cantpelis+1;
                         i=i+1;
                     }
+                    i = i + 1;
                 }
-                if(contpelis==0)
+                if(cantpelis==0)
                     printf("Ningun titulo fue visto tantas veces!\n\n");
-
-
             break;
             }
             case 4:
@@ -93,6 +113,12 @@ int main ()
         }
         printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
         scanf("%d",&opcion);
+        while (opcion < 0 || opcion > 4)
+        {
+            printf("Ingrese de nuevo\n");
+            printf("\nMenu:\n1:Ranking y top10\n2:Valoracion semanal\n3:Filtro cantidad de visualizaciones\n4:Pico visualizaciones\n0:Cerrar\n\nOpcion:");
+            scanf("%d",&opcion);
+        }
     }
     printf("\nGracias por usar el programa");
 
@@ -183,7 +209,29 @@ void OPCION1 (void)
 }
 void OPCION2 (void)
 {
+    //variables
+    int cont,id,lugar;
+    float ponderada;
 
+    //inicio
+    printf("Id de la pelicula a buscar valoracion:");
+    scanf("%i",&id);
+    cont=0;
+    // Buscamos la id de la pelicula para ver si la ingresada existe y corresponde con las guardadas
+    for(int i=0; i < MAX_PELICULAS; i++)
+    {
+        if(id == ListaPeliculas[i].ID)
+        {
+            cont=cont+1;
+            lugar=i;
+        }
+    }
+    if(cont == 1)
+    {
+        ponderada = VALORACION_PONDERADA(lugar);
+        printf("\nLa valoracion semanal de la pelicula %i ,%s es %.2f\n\n",ListaPeliculas[lugar].ID,ListaPeliculas[lugar].Nombre,ponderada);
+    }
+    else printf("\nEl codigo de pelicula no existe\n\n");
     return;
 }
 void OPCION4 (void)
@@ -211,7 +259,7 @@ void RANKING (void)
     int Top10_id[TOP10];
 
     //Carga el total de visualizaciones
-	if (!Cant_opc1) CargaTotalViews();
+	// if (!Cant_opc1) CargaTotalViews();
     //Genera una nueva lista con el top10 de visualizaciones y de IDs de peliculas 
     CargarTop10(Top10_views,Top10_id);
     //Muestra por pantalla toda la lista
@@ -219,32 +267,8 @@ void RANKING (void)
     //Graba todo a un archivo
     GRABAR_TOP10(archivo_top10,Top10_views,Top10_id);
     // Permite no cargar dos o mas veces el total de views en la lista de peliculas
-    Cant_opc1 = 1;
+    // Cant_opc1 = 1;
 
-    return;
-}
-void CargaTotalViews(void)
-{
-    int dia,lista;
-
-    //Suma el total de views de cada pelicula
-    for (lista = 0;lista < MAX_PELICULAS; lista++)
-    {
-        for ( dia = 0; dia < DIAS; dia++)
-        {
-            ListaPeliculas[lista].Views_Total = ListaPeliculas[lista].Views_dia[dia] + ListaPeliculas[lista].Views_Total;
-        }
-    }
-    // printf("\n\n");
-    // for (int i = 0; i < MAX_PELICULAS; i++)
-    // {
-    //     printf("Id:\tDia:\tViews:\tPuntuacion:\tTotal Views:");
-    //     for (int dia_ = 0; dia_ < DIAS; dia_++)
-    //     {
-    //         printf("\n%d\t%d\t%d\t%.2f\t\t%.0f",ListaPeliculas[i].ID,dia_+1,ListaPeliculas[i].Views_dia[dia_],ListaPeliculas[i].Punt_dia[dia_],ListaPeliculas[i].Views_Total);  
-    //     }
-    //     printf("\n\n");
-    // }
     return;
 }
 int BuscaID(int id)
@@ -273,7 +297,7 @@ void CargarTop10(float Top10_views[],int Top10_id[])
         Top10_id[top10] = 0;
     }
     // Ordenamos la lista de peliculas según su total de visualizaciones //
-    OrdenarListaPeliculas ();
+    // OrdenarListaPeliculas ();
     //Copia los 10 primeros elementos del arreglo en el top10
     for (int top10 = 0; top10 < 10; top10++)
     {
@@ -310,6 +334,24 @@ void OrdenarListaPeliculas (void)
 }
 void MostrarTop10 (float Top10_views[],int Top10_id[])
 {
+    printf("\n");
+    // for (int i = 0; i < MAX_PELICULAS; i++)
+    // {
+    //     printf("Id:\tDia:\tViews:\tPuntuacion:\tTotal Views:");
+    //     for (int dia_ = 0; dia_ < DIAS; dia_++)
+    //     {
+    //         printf("\n%d\t%d\t%d\t%.2f\t",ListaPeliculas[i].ID,dia_+1,ListaPeliculas[i].Views_dia[dia_],ListaPeliculas[i].Punt_dia[dia_]);  
+    //     }
+    //     printf("\t%.0f",ListaPeliculas[i].Views_Total);
+    //     printf("\n\n");
+    // }
+    for (int i = 0; i < MAX_PELICULAS; i++)
+    {
+        printf("Id:\tTotal Views:");
+        printf("\n%d",ListaPeliculas[i].ID);  
+        printf("\t%.0f",ListaPeliculas[i].Views_Total);
+        printf("\n\n");
+    }
     // Muestra por pantalla los datos
     printf("\nID:\tViews:\t");
     for (int top10 = 0; top10 < 10; top10++)
@@ -335,3 +377,52 @@ void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[])
     return;
 }
 // -------------------------------------- //
+
+// Funciones relacionadas con la opcion 2 //
+// -------------------------------------- //
+float VALORACION_PONDERADA(int lugar)
+{
+    // Variables
+    int total;
+    float ponderada,puntuacion;
+
+    puntuacion = 0;
+    // Recorremos la lista buscando 
+    for(int i = 0; i < DIAS; i++)
+    {
+        puntuacion = puntuacion + ( ListaPeliculas[lugar].Views_dia[i] * 1.0 * ListaPeliculas[lugar].Punt_dia[i] );
+    }
+    if(ListaPeliculas[lugar].Views_Total != 0) ponderada = puntuacion / ListaPeliculas[lugar].Views_Total;
+    else    return 0;
+    // Suma = Views Totales
+    return(ponderada);
+}
+// -------------------------------------- //
+
+// Funciones relacionadas con varias opciones //
+// -------------------------------------- //
+void AccionesComunes(void)
+{
+    CargaTotalViews();
+    OrdenarListaPeliculas ();
+
+    return;
+}
+void CargaTotalViews(void)
+{
+    int dia,lista;
+
+    //Suma el total de views de cada pelicula
+    for (lista = 0;lista < MAX_PELICULAS; lista++)
+    {
+        for ( dia = 0; dia < DIAS; dia++)
+        {
+            ListaPeliculas[lista].Views_Total = ListaPeliculas[lista].Views_dia[dia] + ListaPeliculas[lista].Views_Total;
+        }
+    }
+    return;
+}
+// -------------------------------------- //
+
+
+
