@@ -81,6 +81,12 @@ int main ()
                 printf("\n");
                 cantpelis=0;
                 i=0;
+		while(views < 0 || views > 99999999999)
+                {
+                    printf("Valor no admitido, ingrese otro nuevamente:\n");
+                    scanf(" %d");
+                }
+
                 while(i<MAX_PELICULAS)
                 {
                     while(views<ListaPeliculas[i].Views_Total)
@@ -103,6 +109,12 @@ int main ()
                 }
                 if(cantpelis==0)
                     printf("Ningun titulo fue visto tantas veces!\n\n");
+	   	while(views < 0 || views > 99999999999)
+                {
+                    printf("Valor no admitido, ingrese otro nuevamente:\n");
+                    scanf(" %d");
+                }
+
             break;
             }
             case 4:
