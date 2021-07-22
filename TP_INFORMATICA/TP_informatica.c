@@ -33,6 +33,7 @@ void MostrarTop10 (float Top10_views[],int Top10_id[]);             // Muestra e
 void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[]);  // Graba en un archivo top10.txt los datos correspondientes
 void AccionesComunes(void);                                         // Llama a funciones que son comunes a mas de una opcion
 float VALORACION_PONDERADA(int lugar);
+void DIA_MAS(int indice, float Views_t_dias[], char eldia[][15]);	// Muestra el dia y la cantidad de las mayores visualizaciones
 
 // Funcion principal //
 // -------------------------------------- //
@@ -202,11 +203,14 @@ void CargarArchivo (FILE *archivo,int num_archivo)
 
 // Funciones de menu //
 // -------------------------------------- //
+
 void OPCION1 (void)
 {
     RANKING();
     return;
 }
+// -------------------------------------- //
+
 void OPCION2 (void)
 {
     //variables
@@ -234,22 +238,55 @@ void OPCION2 (void)
     else printf("\nEl codigo de pelicula no existe\n\n");
     return;
 }
+// -------------------------------------- //
+
 void OPCION4 (void)
 {
-	int dia,lista;
-
-    //Suma el total de views de cada pelicula
-    for (lista = 0;lista < MAX_PELICULAS; lista++)
+    int indice;
+    float Views_t_dias[7], num_may;
+    char eldia[7][15]={"lunes","martes","miercoles","jueves","viernes","sabado","domingo"};
+    
+    for(int j = 0; j < DIAS; j++)	//limpia el arreglo
     {
-        for ( dia = 0; dia < DIAS; dia++)
+        Views_t_dias[j] = 0;
+    }
+    
+    //Suma el total de views de cada pelicula correspondiente a cada dia
+    for(int lista = 0;lista < MAX_PELICULAS;lista++)
+    {
+        for(int dia = 0; dia < DIAS; dia++)
         {
-            ListaPeliculas[lista].Views_Total = ListaPeliculas[lista].Views_dia[dia] + ListaPeliculas[lista].Views_Total;
+			Views_t_dias[dia] = Views_t_dias[dia] + ListaPeliculas[lista].Views_dia[dia];
         }
     }
-    return;
+    
+    for(int dia = 0; dia < DIAS; dia++)
+    {
+    	if(dia==0) num_may=0, indice=0;
+		
+		if(Views_t_dias[dia] > num_may)	num_may=Views_t_dias[dia], indice=dia;
+	}
+	
+	DIA_MAS(indice,Views_t_dias,eldia);
 }
 // -------------------------------------- //
 
+// -------------------------------------- //
+// Funciones relacionadas con la opcion 4 //
+// -------------------------------------- //
+void DIA_MAS(int indice, float Views_t_dias[], char eldia[][15])	
+{
+	printf("\n\n");
+	printf("El dia con mas visualizaciones fue el %s",eldia[indice]);
+	printf(" con %.0f",Views_t_dias[indice]);
+	printf(" visualizaciones");
+	printf("\n\n");
+	
+	return;
+}
+// -------------------------------------- //
+
+// -------------------------------------- //
 // Funciones relacionadas con la opcion 1 //
 // -------------------------------------- //
 void RANKING (void)
