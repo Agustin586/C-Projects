@@ -8,7 +8,6 @@
 #define TOP10           10
 
 // Declaracion de variables globales
-_Bool Cant_opc1;
 typedef struct {
     int ID,Views_dia[DIAS];
     float Punt_dia[DIAS],Views_Total,Punt_Total;
@@ -82,7 +81,7 @@ int main ()
                 printf("\n");
                 cantpelis=0;
                 i=0;
-		while(views < 0 || views > 99999999999)
+		        while(views < 0 || views > 99999999999)
                 {
                     printf("Valor no admitido, ingrese otro nuevamente:\n");
                     scanf(" %d");
@@ -171,8 +170,6 @@ void CargarArchivo (FILE *archivo,int num_archivo)
                 {
                     fscanf (archivo, "%d%s\n", &ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
                 }
-                // Muestra por pantalla toda la lista del archivo
-                // printf("\n%d %s",ListaPeliculas[i].ID, ListaPeliculas[i].Nombre);
             }
         }
     }
@@ -197,16 +194,6 @@ void CargarArchivo (FILE *archivo,int num_archivo)
                 }
             }
         }
-        // printf("\n\n");
-        // for (int i = 0; i < MAX_PELICULAS; i++)
-        // {
-        //     printf("Id:\tDia:\tViews:\tPuntuacion:");
-        //     for (int dia_ = 0; dia_ < DIAS; dia_++)
-        //     {
-        //         printf("\n%d\t%d\t%d\t%.2f",ListaPeliculas[i].ID,dia_+1,ListaPeliculas[i].Views_dia[dia_],ListaPeliculas[i].Punt_dia[dia_]);  
-        //     }
-        //     printf("\n\n");
-        // }
     }
     fclose(archivo);
     return;
@@ -306,17 +293,13 @@ void RANKING (void)
     FILE *archivo_top10;
     float Top10_views[TOP10];
     int Top10_id[TOP10];
-
-    //Carga el total de visualizaciones
-	// if (!Cant_opc1) CargaTotalViews();
-    //Genera una nueva lista con el top10 de visualizaciones y de IDs de peliculas 
+ 
     CargarTop10(Top10_views,Top10_id);
     //Muestra por pantalla toda la lista
     MostrarTop10(Top10_views,Top10_id);
     //Graba todo a un archivo
     GRABAR_TOP10(archivo_top10,Top10_views,Top10_id);
     // Permite no cargar dos o mas veces el total de views en la lista de peliculas
-    // Cant_opc1 = 1;
 
     return;
 }
@@ -384,16 +367,6 @@ void OrdenarListaPeliculas (void)
 void MostrarTop10 (float Top10_views[],int Top10_id[])
 {
     printf("\n");
-    // for (int i = 0; i < MAX_PELICULAS; i++)
-    // {
-    //     printf("Id:\tDia:\tViews:\tPuntuacion:\tTotal Views:");
-    //     for (int dia_ = 0; dia_ < DIAS; dia_++)
-    //     {
-    //         printf("\n%d\t%d\t%d\t%.2f\t",ListaPeliculas[i].ID,dia_+1,ListaPeliculas[i].Views_dia[dia_],ListaPeliculas[i].Punt_dia[dia_]);  
-    //     }
-    //     printf("\t%.0f",ListaPeliculas[i].Views_Total);
-    //     printf("\n\n");
-    // }
     for (int i = 0; i < MAX_PELICULAS; i++)
     {
         printf("Id:\tTotal Views:");
@@ -443,7 +416,6 @@ float VALORACION_PONDERADA(int lugar)
     }
     if(ListaPeliculas[lugar].Views_Total != 0) ponderada = puntuacion / ListaPeliculas[lugar].Views_Total;
     else    return 0;
-    // Suma = Views Totales
     return(ponderada);
 }
 // -------------------------------------- //
