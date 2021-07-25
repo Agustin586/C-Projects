@@ -109,12 +109,11 @@ int main ()
                 }
                 if(cantpelis==0)
                     printf("Ningun titulo fue visto tantas veces!\n\n");
-	   	while(views < 0 || views > 99999999999)
+	   	        while(views < 0 || views > 99999999999)
                 {
                     printf("Valor no admitido, ingrese otro nuevamente:\n");
                     scanf(" %d");
                 }
-
             break;
             }
             case 4:
@@ -202,14 +201,11 @@ void CargarArchivo (FILE *archivo,int num_archivo)
 
 // Funciones de menu //
 // -------------------------------------- //
-
 void OPCION1 (void)
 {
     RANKING();
     return;
 }
-// -------------------------------------- //
-
 void OPCION2 (void)
 {
     //variables
@@ -237,8 +233,6 @@ void OPCION2 (void)
     else printf("\nEl codigo de pelicula no existe\n\n");
     return;
 }
-// -------------------------------------- //
-
 void OPCION4 (void)
 {
     int indice;
@@ -389,10 +383,18 @@ void GRABAR_TOP10(FILE *top10,float Top10_views[],int Top10_id[])
     if ((top10 = fopen("top10.txt", "w")) == NULL)    
             printf ( "Error en la apertura. Es posible que el fichero no exista \n");
     // Comienza a escribir
-    fprintf(top10,"ID:\tViews:\n");
+    fprintf(top10,"ID:\tNombre:\t\t\t\t\t\tViews:\n");
     for (int i = 0; i < TOP10; i++)
     {
-        fprintf(top10,"%d\t%.0f\n",Top10_id[i],Top10_views[i]);
+        peliculas aux;
+        int long_nombre = strlen(ListaPeliculas[i].Nombre); // strlen
+        aux = ListaPeliculas[i];
+        for (int indice = long_nombre; indice < 43; indice++)   // 43 es la cantidad de caracteres del nombre mas largo
+        {
+            strcat(aux.Nombre," ");
+        }
+
+        fprintf(top10,"%d\t%s\t%.0f\n",Top10_id[i],aux.Nombre,Top10_views[i]);
     }
     // Cierra el archivo top10.txt
     fclose(top10);
