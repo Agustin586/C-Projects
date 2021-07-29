@@ -20,7 +20,6 @@ peliculas ListaPeliculas[MAX_PELICULAS];
 void Inicializar (void);    // Inicializa la lista de peliculas por archivos basuras
 void OPCION1 (void);        // Ingresa a la opcion 1 y realiza el procesamiento de datos
 void OPCION2 (void);        // Ingresa a la opcion 2 y realiza ...
-void OPCION3 (void);        // ...
 void OPCION4 (void);        // ...
 void CargarArchivo (FILE *archivo,int num_archiv);                  // Esta funcion se encarga de cargar los archivo al registro
 void RANKING (void);                                                // Se encarga de procesar la opcion 1
@@ -228,7 +227,8 @@ void OPCION2 (void)
     if(cont == 1)
     {
         ponderada = VALORACION_PONDERADA(lugar);
-        printf("\nLa valoracion semanal de la pelicula %i ,%s es %.2f\n\n",ListaPeliculas[lugar].ID,ListaPeliculas[lugar].Nombre,ponderada);
+        printf("\nLa valoracion semanal de la pelicula %i ,%s es %.2f\n\n",ListaPeliculas[lugar].ID
+               ,ListaPeliculas[lugar].Nombre,ponderada);
     }
     else printf("\nEl codigo de pelicula no existe\n\n");
     return;
@@ -322,8 +322,6 @@ void CargarTop10(float Top10_views[],int Top10_id[])
         Top10_views[top10] = 0;
         Top10_id[top10] = 0;
     }
-    // Ordenamos la lista de peliculas según su total de visualizaciones //
-    // OrdenarListaPeliculas ();
     //Copia los 10 primeros elementos del arreglo en el top10
     for (int top10 = 0; top10 < 10; top10++)
     {
@@ -446,6 +444,3 @@ void CargaTotalViews(void)
     return;
 }
 // -------------------------------------- //
-
-
-
