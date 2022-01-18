@@ -359,15 +359,15 @@ void OrdenarListaPeliculas (void)
 void MostrarTop10 (float Top10_views[],int Top10_id[])
 {
     printf("\n");
+    printf("Id:\tTotal Views:");
     for (int i = 0; i < MAX_PELICULAS; i++)
     {
-        printf("Id:\tTotal Views:");
         printf("\n%d",ListaPeliculas[i].ID);  
         printf("\t%.0f",ListaPeliculas[i].Views_Total);
-        printf("\n\n");
+        
     }
     // Muestra por pantalla los datos
-    printf("\nID:\tViews:\t");
+    printf("\n\n\nID:\tViews:\t");
     for (int top10 = 0; top10 < 10; top10++)
     {
         printf("\n%d\t%.0f",Top10_id[top10],Top10_views[top10]);
